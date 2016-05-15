@@ -26,15 +26,6 @@ class MultipleKeysHandler(tornado.web.RequestHandler):
                     <head>
                         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
                         <script>
-                            $(document).ready(function(){
-                                $("button").click(function(){
-                                    $.get("/", function(data, status){
-                                        alert("Data: " + data + "\nStatus: " + status);
-                                    });
-                                });
-                            });
-                        </script>
-                        <script>
                             var keys = {};
 
                             $(document).keydown(function (e) {
