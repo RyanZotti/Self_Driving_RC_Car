@@ -23,60 +23,59 @@ class MultipleKeysHandler(tornado.web.RequestHandler):
         self.write('''
                 <!DOCTYPE html>
                 <html>
-                <head>
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-                <script>
-                $(document).ready(function(){
-                    $("button").click(function(){
-                        $.get("/", function(data, status){
-                            alert("Data: " + data + "\nStatus: " + status);
-                        });
-                    });
-                });
-                </script>
-                <script>
+                    <head>
+                        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+                        <script>
+                            $(document).ready(function(){
+                                $("button").click(function(){
+                                    $.get("/", function(data, status){
+                                        alert("Data: " + data + "\nStatus: " + status);
+                                    });
+                                });
+                            });
+                        </script>
+                        <script>
+                            var keys = {};
 
-var keys = {};
+                            $(document).keydown(function (e) {
+                                keys[e.which] = true;
+                                
+                                var json_upload = JSON.stringify({command:keys});
+                                var xmlhttp = new XMLHttpRequest(); 
+                                xmlhttp.open("POST", "/post");
+                                xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                                xmlhttp.send(json_upload);
 
-$(document).keydown(function (e) {
-    keys[e.which] = true;
-    
-    var json_upload = JSON.stringify({command:keys});
-    var xmlhttp = new XMLHttpRequest(); 
-    xmlhttp.open("POST", "/post");
-    xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xmlhttp.send(json_upload);
+                                printKeys();
+                            });
 
-    printKeys();
-});
+                            $(document).keyup(function (e) {
+                                delete keys[e.which];
+                                
+                                var json_upload = JSON.stringify({command:keys});
+                                var xmlhttp = new XMLHttpRequest(); 
+                                xmlhttp.open("POST", "/post");
+                                xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                                xmlhttp.send(json_upload);
 
-$(document).keyup(function (e) {
-    delete keys[e.which];
-    
-    var json_upload = JSON.stringify({command:keys});
-    var xmlhttp = new XMLHttpRequest(); 
-    xmlhttp.open("POST", "/post");
-    xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xmlhttp.send(json_upload);
+                                printKeys();
+                            });
 
-    printKeys();
-});
+                            function printKeys() {
+                                var html = '';
+                                for (var i in keys) {
+                                    if (!keys.hasOwnProperty(i)) continue;
+                                    html += '<p>' + i + '</p>';
+                                }
+                                $('#out').html(html);
+                            }
 
-function printKeys() {
-    var html = '';
-    for (var i in keys) {
-        if (!keys.hasOwnProperty(i)) continue;
-        html += '<p>' + i + '</p>';
-    }
-    $('#out').html(html);
-}
-
-                </script>
-                </head>
-                <body>
-                Click in this frame, then try holding down some keys
-                <div id="out"></div>
-                </body>
+                        </script>
+                    </head>
+                    <body>
+                        Click in this frame, then try holding down some keys
+                        <div id="out"></div>
+                    </body>
                 </html>
             ''')
 
