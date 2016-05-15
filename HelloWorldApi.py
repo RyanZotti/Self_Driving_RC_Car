@@ -1,10 +1,21 @@
 import tornado.ioloop
 import tornado.web
 
+# import requests
+# r = requests.get('http://localhost:80/')
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         print("HelloWorld")
         self.write("Hello, world")
+
+# import requests
+# r = requests.post('http://localhost:80/post',json={'command':'speed'})
+class PostHandler(tornado.web.RequestHandler):
+    def post(self):
+        data_json = tornado.escape.json_decode(self.request.body)
+        command = data_json['command']
+        print(command)
+            
 
 class MultipleKeysHandler(tornado.web.RequestHandler):
     def get(self):
@@ -30,11 +41,23 @@ var keys = {};
 $(document).keydown(function (e) {
     keys[e.which] = true;
     
+    var json_upload = JSON.stringify({command:keys});
+    var xmlhttp = new XMLHttpRequest(); 
+    xmlhttp.open("POST", "/post");
+    xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xmlhttp.send(json_upload);
+
     printKeys();
 });
 
 $(document).keyup(function (e) {
     delete keys[e.which];
+    
+    var json_upload = JSON.stringify({command:keys});
+    var xmlhttp = new XMLHttpRequest(); 
+    xmlhttp.open("POST", "/post");
+    xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xmlhttp.send(json_upload);
     
     printKeys();
 });
@@ -86,7 +109,7 @@ class SomeHandler(tornado.web.RequestHandler):
 def make_app():
     return tornado.web.Application([
         (r"/",SomeHandler ),(r"/abc",MainHandler),
-        (r"/a",MultipleKeysHandler)
+        (r"/a",MultipleKeysHandler),(r"/post", PostHandler)
     ])
 
 if __name__ == "__main__":
