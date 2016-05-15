@@ -1,11 +1,12 @@
 import tornado.ioloop
 import tornado.web
+from datetime import datetime
 
 # import requests
 # r = requests.get('http://localhost:80/')
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        print("HelloWorld")
+        print(big_list)
         self.write("Hello, world")
 
 # import requests
@@ -14,7 +15,10 @@ class PostHandler(tornado.web.RequestHandler):
     def post(self):
         data_json = tornado.escape.json_decode(self.request.body)
         command = data_json['command']
-        print(command)
+        command = command.keys()
+        timestamp = datetime.now()
+        big_list.append(command)
+        print(str(command)+" "+str(timestamp))
             
 
 class MultipleKeysHandler(tornado.web.RequestHandler):
@@ -77,6 +81,7 @@ def make_app():
     ])
 
 if __name__ == "__main__":
+    big_list = []
     app = make_app()
     app.listen(80)
     tornado.ioloop.IOLoop.current().start()
