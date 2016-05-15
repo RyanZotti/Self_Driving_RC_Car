@@ -58,7 +58,7 @@ $(document).keyup(function (e) {
     xmlhttp.open("POST", "/post");
     xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xmlhttp.send(json_upload);
-    
+
     printKeys();
 });
 
@@ -80,35 +80,9 @@ function printKeys() {
                 </html>
             ''')
 
-class SomeHandler(tornado.web.RequestHandler):
-    def get(self):
-        print("SomeHandler")
-        self.write('''
-                <!DOCTYPE html>
-                <html>
-                <head>
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-                <script>
-                $(document).ready(function(){
-                    $("button").click(function(){
-                        $.get("/", function(data, status){
-                            alert("Data: " + data + "\nStatus: " + status);
-                        });
-                    });
-                });
-                </script>
-                </head>
-                <body>
-
-                <button>Send an HTTP GET request to a page and get the result back</button>
-
-                </body>
-                </html>
-            ''')
-
 def make_app():
     return tornado.web.Application([
-        (r"/",SomeHandler ),(r"/abc",MainHandler),
+        (r"/abc",MainHandler),
         (r"/a",MultipleKeysHandler),(r"/post", PostHandler)
     ])
 
