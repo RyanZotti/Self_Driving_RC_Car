@@ -14,8 +14,11 @@ class MainHandler(tornado.web.RequestHandler):
 class PostHandler(tornado.web.RequestHandler):
     def post(self):
         data_json = tornado.escape.json_decode(self.request.body)
+        allowed_commands = set(['38','37','39','40'])
         command = data_json['command']
-        command = command.keys()
+        command = list(command.keys())
+        command = set(command)
+        command = allowed_commands & command
         timestamp = datetime.now()
         big_list.append(command)
         print(str(command)+" "+str(timestamp))
