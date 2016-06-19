@@ -3,6 +3,8 @@ import tornado.web
 from datetime import datetime
 import os
 from operator import itemgetter
+import RPi.GPIO as GPIO
+from time import sleep
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -42,12 +44,23 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                     for element in list(command):
                         if element == '37':
                             readable_command.append("left")
+                            steering_motor.left(50)
+                            sleep(0.5)
                         if element == '38':
                             readable_command.append("up")
+                            motor.forward(10)
+                            sleep(0.5)
+                            motor.stop()
                         if element == '39':
                             readable_command.append("right")
+                            steering_motor.right(50)
+                            sleep(0.5)
+                            motor.stop()
                         if element == '40':
                             readable_command.append("down")
+                            motor.backward(10)
+                            sleep(0.5)
+                            motor.stop()
                     log_entry = str(list(readable_command))+" "+str(timestamp)
                     writer.write(log_entry+"\n")
                 print(log_entry)
@@ -108,6 +121,51 @@ class MultipleKeysHandler(tornado.web.RequestHandler):
             ''')
 
 
+class Motor:
+
+    def __init__(self, pinForward, pinBackward, pinControl):
+        """ Initialize the motor with its control pins and start pulse-width
+             modulation """
+
+        self.pinForward = pinForward
+        self.pinBackward = pinBackward
+        self.pinControl = pinControl
+        GPIO.setup(self.pinForward, GPIO.OUT)
+        GPIO.setup(self.pinBackward, GPIO.OUT)
+        GPIO.setup(self.pinControl, GPIO.OUT)
+        self.pwm_forward = GPIO.PWM(self.pinForward, 100)
+        self.pwm_backward = GPIO.PWM(self.pinBackward, 100)
+        self.pwm_forward.start(0)
+        self.pwm_backward.start(0)
+        GPIO.output(self.pinControl,GPIO.HIGH) 
+
+    def forward(self, speed):
+        """ pinForward is the forward Pin, so we change its duty
+             cycle according to speed. """
+        self.pwm_backward.ChangeDutyCycle(0)
+        self.pwm_forward.ChangeDutyCycle(speed)    
+
+    def backward(self, speed):
+        """ pinBackward is the forward Pin, so we change its duty
+             cycle according to speed. """
+
+        self.pwm_forward.ChangeDutyCycle(0)
+        self.pwm_backward.ChangeDutyCycle(speed)
+
+    def stop(self):
+        """ Set the duty cycle of both control pins to zero to stop the motor. """
+
+        self.pwm_forward.ChangeDutyCycle(0)
+        self.pwm_backward.ChangeDutyCycle(0)
+
+class SteeringMotor(Motor):
+
+    def left(self,speed):
+        self.forward(speed)
+
+    def right(self,speed):
+        self.backward(speed)
+
 def make_app():
     return tornado.web.Application([
         (r"/abc",MainHandler),
@@ -116,7 +174,13 @@ def make_app():
     ])
 
 if __name__ == "__main__":
+    GPIO.setmode(GPIO.BOARD)
+    motor = Motor(16, 18, 22)
+    steering_motor = SteeringMotor(19, 21, 23)
     log_entries = []
     app = make_app()
     app.listen(80)
     tornado.ioloop.IOLoop.current().start()
+    
+
+
