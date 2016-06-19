@@ -42,7 +42,7 @@ class PostHandler(tornado.web.RequestHandler):
             sleep(0.5)
             motor.stop()
         elif '38' in command:
-            motor.forward(10)
+            motor.forward(90)
             sleep(0.5)
             motor.stop()
         elif '39' in command:
@@ -50,7 +50,7 @@ class PostHandler(tornado.web.RequestHandler):
             sleep(0.5)
             motor.stop()
         elif '40' in command:
-            motor.pwm_backward(90)
+            motor.backward(90)
             sleep(0.5)
             motor.stop()
          
