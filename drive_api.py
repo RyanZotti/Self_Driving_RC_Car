@@ -27,19 +27,32 @@ class PostHandler(tornado.web.RequestHandler):
         with open(file_path,"a") as writer:
             writer.write(log_entry+"\n")
         print(log_entry)
-        if '37' in command:
+        command_duration = 0.1
+        if '37' in command and '38' in command:
+            steering_motor.left(50)
+            motor.forward(90)
+            sleep(command_duration)
+            steering_motor.stop()
+            motor.stop()
+        elif '39' in command and '38' in command:
+            steering_motor.right(50)
+            motor.forward(90)
+            sleep(command_duration)
+            steering_motor.stop()
+            motor.stop()
+        elif '37' in command:
             steering_motor.left(50)
             sleep(0.5)
             steering_motor.stop()
-        if '38' in command:
+        elif '38' in command:
             motor.forward(90)
             sleep(0.5)
             motor.stop()
-        if '39' in command:
+        elif '39' in command:
             steering_motor.right(50)
             sleep(0.5)
             steering_motor.stop()
-        if '40' in command:
+        elif '40' in command:
             motor.backward(90)
             sleep(0.5)
             motor.stop()
