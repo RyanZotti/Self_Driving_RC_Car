@@ -193,9 +193,6 @@ if __name__ == "__main__":
     GPIO.setmode(GPIO.BOARD)
     motor = Motor(16, 18, 22)
     steering_motor = SteeringMotor(19, 21, 23)
-    motor.forward(10)
-    sleep(1)
-    motor.stop()
     log_entries = []
     app = make_app()
     app.listen(80)
