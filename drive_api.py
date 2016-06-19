@@ -17,7 +17,7 @@ class PostHandler(tornado.web.RequestHandler):
     def post(self):
         timestamp = datetime.now()
         data_json = tornado.escape.json_decode(self.request.body)
-        allowed_commands = set(['38','37','39','40'])
+        allowed_commands = set(['49','50','51','52','53','54','55'])
         command = data_json['command']
         command = list(command.keys())
         command = set(command)
@@ -44,6 +44,8 @@ class PostHandler(tornado.web.RequestHandler):
             motor.forward_right(60)
         elif '55' in command:
             motor.forward_right(30)
+        else:
+            motor.stop()
          
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
     def get(self):
