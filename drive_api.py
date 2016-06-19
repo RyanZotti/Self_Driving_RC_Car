@@ -4,12 +4,41 @@ from datetime import datetime
 import os
 from operator import itemgetter
 import RPi.GPIO as GPIO
+import requests
 from time import sleep
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         print(big_list)
         self.write("Hello, world")
+
+class Forward(tornado.web.RequestHandler):
+
+    def post(self):
+        motor.forward(90)
+        sleep(command_duration)
+        motor.stop()
+
+class Backward(tornado.web.RequestHandler):
+
+    def post(self):
+        motor.backward(90)
+        sleep(command_duration)
+        motor.stop()
+
+class Left(tornado.web.RequestHandler):
+
+    def post(self):
+        steering_motor.left(50)
+        sleep(command_duration)
+        steering_motor.stop()
+
+class Right(tornado.web.RequestHandler):
+
+    def post(self):
+        steering_motor.right(50)
+        sleep(command_duration)
+        steering_motor.stop()
 
 class PostHandler(tornado.web.RequestHandler):
 
@@ -28,20 +57,9 @@ class PostHandler(tornado.web.RequestHandler):
             writer.write(log_entry+"\n")
         print(log_entry)
         command_duration = 0.1
-        if '37' in command and '38' in command:
-            steering_motor.left(50)
-            motor.forward(90)
-            sleep(command_duration)
-            steering_motor.stop()
-            motor.stop()
-        elif '39' in command and '38' in command:
-            steering_motor.right(50)
-            motor.forward(90)
-            sleep(command_duration)
-            steering_motor.stop()
-            motor.stop()
         elif '37' in command:
             steering_motor.left(50)
+            r = requests.post('http://localhost:80/post')
             sleep(0.5)
             steering_motor.stop()
         elif '38' in command:
@@ -72,20 +90,24 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                     readable_command = []
                     for element in list(command):
                         if element == '37':
+                            r = requests.post('http://localhost:80/left')
                             readable_command.append("left")
                             steering_motor.left(50)
                             sleep(0.5)
                         if element == '38':
+                            r = requests.post('http://localhost:80/forward')
                             readable_command.append("up")
                             motor.forward(10)
                             sleep(0.5)
                             motor.stop()
                         if element == '39':
+                            r = requests.post('http://localhost:80/right')
                             readable_command.append("right")
                             steering_motor.right(50)
                             sleep(0.5)
                             motor.stop()
                         if element == '40':
+                            r = requests.post('http://localhost:80/backward')
                             readable_command.append("down")
                             motor.pwm_backward(10)
                             sleep(0.5)
@@ -199,11 +221,16 @@ def make_app():
     return tornado.web.Application([
         (r"/abc",MainHandler),
         (r"/a",MultipleKeysHandler),(r"/post", PostHandler),
-        (r"/StoreLogEntries",StoreLogEntriesHandler)
+        (r"/StoreLogEntries",StoreLogEntriesHandler),
+        (r"/forward",Forward),
+        (r"/backward",Backward),
+        (r"/left",Left),
+        (r"/right",Right),
     ])
 
 if __name__ == "__main__":
     GPIO.setmode(GPIO.BOARD)
+    command_duration = 0.1
     motor = Motor(16, 18, 22)
     steering_motor = SteeringMotor(19, 21, 23)
     log_entries = []
