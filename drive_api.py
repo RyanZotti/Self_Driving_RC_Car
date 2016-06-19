@@ -30,15 +30,19 @@ class PostHandler(tornado.web.RequestHandler):
         if '37' in command:
             steering_motor.left(50)
             sleep(0.5)
+            steering_motor.stop()
         if '38' in command:
             motor.forward(90)
             sleep(0.5)
+            motor.stop()
         if '39' in command:
             steering_motor.right(50)
             sleep(0.5)
+            steering_motor.stop()
         if '40' in command:
             motor.pwm_backward(90)
             sleep(0.5)
+            motor.stop()
          
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
     def get(self):
