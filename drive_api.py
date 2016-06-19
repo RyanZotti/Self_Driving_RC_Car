@@ -242,11 +242,7 @@ def make_app():
     return tornado.web.Application([
         (r"/abc",MainHandler),
         (r"/a",MultipleKeysHandler),(r"/post", PostHandler),
-        (r"/StoreLogEntries",StoreLogEntriesHandler),
-        (r"/forward",Forward),
-        (r"/backward",Backward),
-        (r"/left",Left),
-        (r"/right",Right),
+        (r"/StoreLogEntries",StoreLogEntriesHandler)
     ])
 
 if __name__ == "__main__":
