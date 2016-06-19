@@ -231,7 +231,7 @@ class Motor:
         self.pwm_forward.ChangeDutyCycle(0)
         self.pwm_backward.ChangeDutyCycle(0)
         self.pwm_left.ChangeDutyCycle(0)
-        self.right.ChangeDutyCycle(0)
+        self.pwm_right.ChangeDutyCycle(0)
 
 def make_app():
     return tornado.web.Application([
