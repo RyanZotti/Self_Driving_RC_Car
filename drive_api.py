@@ -57,7 +57,7 @@ class PostHandler(tornado.web.RequestHandler):
             writer.write(log_entry+"\n")
         print(log_entry)
         command_duration = 0.1
-        elif '37' in command:
+        if '37' in command:
             r = requests.post('http://localhost:80/left')
             readable_command.append("left")
             steering_motor.left(50)
