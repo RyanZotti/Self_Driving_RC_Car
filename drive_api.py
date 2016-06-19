@@ -40,7 +40,7 @@ class PostHandler(tornado.web.RequestHandler):
             sleep(0.5)
             steering_motor.stop()
         if '40' in command:
-            motor.pwm_backward(90)
+            motor.backward(90)
             sleep(0.5)
             motor.stop()
          
