@@ -29,30 +29,21 @@ class PostHandler(tornado.web.RequestHandler):
             writer.write(log_entry+"\n")
         print(log_entry)
         command_duration = 0.1
-        if '37' in command and '38' in command:
+
+        if '49' in command:
+            motor.forward_left(30)
+        elif '50' in command:
+            motor.forward_left(60)
+        elif '51' in command:
             motor.forward_left(90)
-            sleep(0.5)
-            motor.stop()
-        elif '39' in command and '38' in command:
-            motor.forward_right(90)
-            sleep(0.5)
-            motor.stop()
-        elif '37' in command:
-            motor.left(50)
-            sleep(0.5)
-            motor.stop()
-        elif '38' in command:
+        elif '52' in command:
             motor.forward(90)
-            sleep(0.5)
-            motor.stop()
-        elif '39' in command:
-            motor.right(50)
-            sleep(0.5)
-            motor.stop()
-        elif '40' in command:
-            motor.backward(90)
-            sleep(0.5)
-            motor.stop()
+        elif '53' in command:
+            motor.forward_right(90)
+        elif '54' in command:
+            motor.forward_right(60)
+        elif '55' in command:
+            motor.forward_right(30)
          
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
     def get(self):
