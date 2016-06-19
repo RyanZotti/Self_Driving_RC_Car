@@ -27,6 +27,18 @@ class PostHandler(tornado.web.RequestHandler):
         with open(file_path,"a") as writer:
             writer.write(log_entry+"\n")
         print(log_entry)
+        if '37' in command:
+            steering_motor.left(50)
+            sleep(0.5)
+        if '38' in command:
+            motor.forward(90)
+            sleep(0.5)
+        if '39' in command:
+            steering_motor.right(50)
+            sleep(0.5)
+        if '40' in command:
+            motor.pwm_backward(90)
+            sleep(0.5)
          
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
     def get(self):
@@ -58,7 +70,7 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                             motor.stop()
                         if element == '40':
                             readable_command.append("down")
-                            motor.backward(10)
+                            motor.pwm_backward(10)
                             sleep(0.5)
                             motor.stop()
                     log_entry = str(list(readable_command))+" "+str(timestamp)
@@ -177,6 +189,9 @@ if __name__ == "__main__":
     GPIO.setmode(GPIO.BOARD)
     motor = Motor(16, 18, 22)
     steering_motor = SteeringMotor(19, 21, 23)
+    motor.forward(10)
+    sleep(1)
+    motor.stop()
     log_entries = []
     app = make_app()
     app.listen(80)
