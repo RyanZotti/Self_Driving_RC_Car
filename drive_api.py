@@ -38,26 +38,18 @@ class PostHandler(tornado.web.RequestHandler):
             sleep(0.5)
             motor.stop()
         elif '37' in command:
-            #r = requests.post('http://localhost:80/left')
-            #readable_command.append("left")
             motor.left(50)
             sleep(0.5)
             motor.stop()
         elif '38' in command:
-            #r = requests.post('http://localhost:80/forward')
-            #readable_command.append("up")
             motor.forward(10)
             sleep(0.5)
             motor.stop()
         elif '39' in command:
-            #r = requests.post('http://localhost:80/right')
-            #readable_command.append("right")
             motor.right(50)
             sleep(0.5)
             motor.stop()
         elif '40' in command:
-            #r = requests.post('http://localhost:80/backward')
-            #readable_command.append("down")
             motor.pwm_backward(90)
             sleep(0.5)
             motor.stop()
@@ -238,6 +230,8 @@ class Motor:
 
         self.pwm_forward.ChangeDutyCycle(0)
         self.pwm_backward.ChangeDutyCycle(0)
+        self.pwm_left.ChangeDutyCycle(0)
+        self.right.ChangeDutyCycle(0)
 
 def make_app():
     return tornado.web.Application([
