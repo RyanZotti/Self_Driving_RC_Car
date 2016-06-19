@@ -42,6 +42,7 @@ class PostHandler(tornado.web.RequestHandler):
             #readable_command.append("left")
             motor.left(50)
             sleep(0.5)
+            motor.stop()
         elif '38' in command:
             #r = requests.post('http://localhost:80/forward')
             #readable_command.append("up")
@@ -57,7 +58,7 @@ class PostHandler(tornado.web.RequestHandler):
         elif '40' in command:
             #r = requests.post('http://localhost:80/backward')
             #readable_command.append("down")
-            motor.pwm_backward(10)
+            motor.pwm_backward(90)
             sleep(0.5)
             motor.stop()
          
