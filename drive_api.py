@@ -29,29 +29,21 @@ class PostHandler(tornado.web.RequestHandler):
             writer.write(log_entry+"\n")
         print(log_entry)
         command_duration = 0.1
-        if '37' in command and '38' in command:
+        if '37' in command:
             motor.forward_left(90)
-            sleep(0.5)
+            sleep(command_duration)
             motor.stop()
-        elif '39' in command and '38' in command:
+        elif '39' in command:
             motor.forward_right(90)
-            sleep(0.5)
-            motor.stop()
-        elif '37' in command:
-            motor.left(50)
-            sleep(0.5)
+            sleep(command_duration)
             motor.stop()
         elif '38' in command:
             motor.forward(90)
-            sleep(0.5)
-            motor.stop()
-        elif '39' in command:
-            motor.right(50)
-            sleep(0.5)
+            sleep(command_duration)
             motor.stop()
         elif '40' in command:
             motor.backward(90)
-            sleep(0.5)
+            sleep(command_duration)
             motor.stop()
          
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
@@ -157,6 +149,7 @@ class Motor:
         """ Initialize the motor with its control pins and start pulse-width
              modulation """
 
+        self.turn_speed = 100
         self.pinForward = pinForward
         self.pinBackward = pinBackward
         self.pinControlStraight = pinControlStraight
@@ -196,7 +189,7 @@ class Motor:
         self.pwm_backward.ChangeDutyCycle(0)
         self.pwm_forward.ChangeDutyCycle(speed)  
         self.pwm_right.ChangeDutyCycle(0)
-        self.pwm_left.ChangeDutyCycle(50)   
+        self.pwm_left.ChangeDutyCycle(self.turn_speed)   
 
     def forward_right(self, speed):
         """ pinForward is the forward Pin, so we change its duty
@@ -204,7 +197,7 @@ class Motor:
         self.pwm_backward.ChangeDutyCycle(0)
         self.pwm_forward.ChangeDutyCycle(speed)
         self.pwm_left.ChangeDutyCycle(0)
-        self.pwm_right.ChangeDutyCycle(50)
+        self.pwm_right.ChangeDutyCycle(self.turn_speed)
 
     def backward(self, speed):
         """ pinBackward is the forward Pin, so we change its duty
