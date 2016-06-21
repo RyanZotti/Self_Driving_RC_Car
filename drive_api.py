@@ -17,7 +17,7 @@ class PostHandler(tornado.web.RequestHandler):
     def post(self):
         timestamp = datetime.now()
         data_json = tornado.escape.json_decode(self.request.body)
-        allowed_commands = set(['38','37','39','40'])
+        allowed_commands = set(['49','50','51','52','53','54','55'])
         command = data_json['command']
         command = list(command.keys())
         command = set(command)
@@ -29,21 +29,22 @@ class PostHandler(tornado.web.RequestHandler):
             writer.write(log_entry+"\n")
         print(log_entry)
         command_duration = 0.1
-        if '37' in command:
-            motor.forward_left(90)
-            sleep(command_duration)
-            motor.stop()
-        elif '39' in command:
-            motor.forward_right(90)
-            sleep(command_duration)
-            motor.stop()
+
+        if '49' in command:
+            motor.forward_left(30)
+        elif '50' in command:
+            motor.forward_left(60)
+        elif '37' in command:
+            motor.forward_left(100)
         elif '38' in command:
-            motor.forward(90)
-            sleep(command_duration)
-            motor.stop()
-        elif '40' in command:
-            motor.backward(90)
-            sleep(command_duration)
+            motor.forward(100)
+        elif '39' in command:
+            motor.forward_right(100)
+        elif '54' in command:
+            motor.forward_right(60)
+        elif '55' in command:
+            motor.forward_right(30)
+        else:
             motor.stop()
          
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
@@ -60,10 +61,11 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                 with open(file_path,"a") as writer:
                     readable_command = []
                     for element in list(command):
+                        turn_speed = 100
                         if element == '37':
                             r = requests.post('http://localhost:80/left')
                             readable_command.append("left")
-                            steering_motor.left(50)
+                            steering_motor.left(turn_speed)
                             sleep(0.5)
                         if element == '38':
                             r = requests.post('http://localhost:80/forward')
@@ -149,7 +151,6 @@ class Motor:
         """ Initialize the motor with its control pins and start pulse-width
              modulation """
 
-        self.turn_speed = 100
         self.pinForward = pinForward
         self.pinBackward = pinBackward
         self.pinControlStraight = pinControlStraight
@@ -189,7 +190,7 @@ class Motor:
         self.pwm_backward.ChangeDutyCycle(0)
         self.pwm_forward.ChangeDutyCycle(speed)  
         self.pwm_right.ChangeDutyCycle(0)
-        self.pwm_left.ChangeDutyCycle(self.turn_speed)   
+        self.pwm_left.ChangeDutyCycle(100)   
 
     def forward_right(self, speed):
         """ pinForward is the forward Pin, so we change its duty
@@ -197,7 +198,7 @@ class Motor:
         self.pwm_backward.ChangeDutyCycle(0)
         self.pwm_forward.ChangeDutyCycle(speed)
         self.pwm_left.ChangeDutyCycle(0)
-        self.pwm_right.ChangeDutyCycle(self.turn_speed)
+        self.pwm_right.ChangeDutyCycle(100)
 
     def backward(self, speed):
         """ pinBackward is the forward Pin, so we change its duty
@@ -241,6 +242,3 @@ if __name__ == "__main__":
     app = make_app()
     app.listen(80)
     tornado.ioloop.IOLoop.current().start()
-    
-
-
