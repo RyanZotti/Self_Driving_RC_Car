@@ -17,7 +17,7 @@ class PostHandler(tornado.web.RequestHandler):
     def post(self):
         timestamp = datetime.now()
         data_json = tornado.escape.json_decode(self.request.body)
-        allowed_commands = set(['49','50','51','52','53','54','55'])
+        allowed_commands = set(['49','50','51','52','53','54','55','37','38','39'])
         command = data_json['command']
         command = list(command.keys())
         command = set(command)
