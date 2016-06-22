@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 from operator import itemgetter
 import RPi.GPIO as GPIO
+import requests
 from time import sleep
 
 class MainHandler(tornado.web.RequestHandler):
@@ -16,7 +17,7 @@ class PostHandler(tornado.web.RequestHandler):
     def post(self):
         timestamp = datetime.now()
         data_json = tornado.escape.json_decode(self.request.body)
-        allowed_commands = set(['38','37','39','40'])
+        allowed_commands = set(['49','50','51','52','53','54','55','37','38','39'])
         command = data_json['command']
         command = list(command.keys())
         command = set(command)
@@ -28,33 +29,22 @@ class PostHandler(tornado.web.RequestHandler):
             writer.write(log_entry+"\n")
         print(log_entry)
         command_duration = 0.1
-        if '37' in command and '38' in command:
-            steering_motor.left(50)
-            motor.forward(90)
-            sleep(command_duration)
-            steering_motor.stop()
-            motor.stop()
-        elif '39' in command and '38' in command:
-            steering_motor.right(50)
-            motor.forward(90)
-            sleep(command_duration)
-            steering_motor.stop()
-            motor.stop()
+
+        if '49' in command:
+            motor.forward_left(30)
+        elif '50' in command:
+            motor.forward_left(60)
         elif '37' in command:
-            steering_motor.left(50)
-            sleep(0.5)
-            steering_motor.stop()
+            motor.forward_left(100)
         elif '38' in command:
-            motor.forward(90)
-            sleep(0.5)
-            motor.stop()
+            motor.forward(100)
         elif '39' in command:
-            steering_motor.right(50)
-            sleep(0.5)
-            steering_motor.stop()
-        elif '40' in command:
-            motor.backward(90)
-            sleep(0.5)
+            motor.forward_right(100)
+        elif '54' in command:
+            motor.forward_right(60)
+        elif '55' in command:
+            motor.forward_right(30)
+        else:
             motor.stop()
          
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
@@ -71,21 +61,26 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                 with open(file_path,"a") as writer:
                     readable_command = []
                     for element in list(command):
+                        turn_speed = 100
                         if element == '37':
+                            r = requests.post('http://localhost:80/left')
                             readable_command.append("left")
-                            steering_motor.left(50)
+                            steering_motor.left(turn_speed)
                             sleep(0.5)
                         if element == '38':
+                            r = requests.post('http://localhost:80/forward')
                             readable_command.append("up")
                             motor.forward(10)
                             sleep(0.5)
                             motor.stop()
                         if element == '39':
+                            r = requests.post('http://localhost:80/right')
                             readable_command.append("right")
                             steering_motor.right(50)
                             sleep(0.5)
                             motor.stop()
                         if element == '40':
+                            r = requests.post('http://localhost:80/backward')
                             readable_command.append("down")
                             motor.pwm_backward(10)
                             sleep(0.5)
@@ -152,27 +147,58 @@ class MultipleKeysHandler(tornado.web.RequestHandler):
 
 class Motor:
 
-    def __init__(self, pinForward, pinBackward, pinControl):
+    def __init__(self, pinForward, pinBackward, pinControlStraight,pinLeft, pinRight, pinControlSteering):
         """ Initialize the motor with its control pins and start pulse-width
              modulation """
 
         self.pinForward = pinForward
         self.pinBackward = pinBackward
-        self.pinControl = pinControl
+        self.pinControlStraight = pinControlStraight
+        self.pinLeft = pinLeft
+        self.pinRight = pinRight
+        self.pinControlSteering = pinControlSteering
         GPIO.setup(self.pinForward, GPIO.OUT)
         GPIO.setup(self.pinBackward, GPIO.OUT)
-        GPIO.setup(self.pinControl, GPIO.OUT)
+        GPIO.setup(self.pinControlStraight, GPIO.OUT)
+
+        GPIO.setup(self.pinLeft, GPIO.OUT)
+        GPIO.setup(self.pinRight, GPIO.OUT)
+        GPIO.setup(self.pinControlSteering, GPIO.OUT)
+
         self.pwm_forward = GPIO.PWM(self.pinForward, 100)
         self.pwm_backward = GPIO.PWM(self.pinBackward, 100)
         self.pwm_forward.start(0)
         self.pwm_backward.start(0)
-        GPIO.output(self.pinControl,GPIO.HIGH) 
+
+        self.pwm_left = GPIO.PWM(self.pinLeft, 100)
+        self.pwm_right = GPIO.PWM(self.pinRight, 100)
+        self.pwm_left.start(0)
+        self.pwm_right.start(0)
+
+        GPIO.output(self.pinControlStraight,GPIO.HIGH) 
+        GPIO.output(self.pinControlSteering,GPIO.HIGH) 
 
     def forward(self, speed):
         """ pinForward is the forward Pin, so we change its duty
              cycle according to speed. """
         self.pwm_backward.ChangeDutyCycle(0)
         self.pwm_forward.ChangeDutyCycle(speed)    
+
+    def forward_left(self, speed):
+        """ pinForward is the forward Pin, so we change its duty
+             cycle according to speed. """
+        self.pwm_backward.ChangeDutyCycle(0)
+        self.pwm_forward.ChangeDutyCycle(speed)  
+        self.pwm_right.ChangeDutyCycle(0)
+        self.pwm_left.ChangeDutyCycle(100)   
+
+    def forward_right(self, speed):
+        """ pinForward is the forward Pin, so we change its duty
+             cycle according to speed. """
+        self.pwm_backward.ChangeDutyCycle(0)
+        self.pwm_forward.ChangeDutyCycle(speed)
+        self.pwm_left.ChangeDutyCycle(0)
+        self.pwm_right.ChangeDutyCycle(100)
 
     def backward(self, speed):
         """ pinBackward is the forward Pin, so we change its duty
@@ -181,19 +207,25 @@ class Motor:
         self.pwm_forward.ChangeDutyCycle(0)
         self.pwm_backward.ChangeDutyCycle(speed)
 
+    def left(self, speed):
+        """ pinForward is the forward Pin, so we change its duty
+             cycle according to speed. """
+        self.pwm_right.ChangeDutyCycle(0)
+        self.pwm_left.ChangeDutyCycle(speed)  
+
+    def right(self, speed):
+        """ pinForward is the forward Pin, so we change its duty
+             cycle according to speed. """
+        self.pwm_left.ChangeDutyCycle(0)
+        self.pwm_right.ChangeDutyCycle(speed)   
+
     def stop(self):
         """ Set the duty cycle of both control pins to zero to stop the motor. """
 
         self.pwm_forward.ChangeDutyCycle(0)
         self.pwm_backward.ChangeDutyCycle(0)
-
-class SteeringMotor(Motor):
-
-    def left(self,speed):
-        self.forward(speed)
-
-    def right(self,speed):
-        self.backward(speed)
+        self.pwm_left.ChangeDutyCycle(0)
+        self.pwm_right.ChangeDutyCycle(0)
 
 def make_app():
     return tornado.web.Application([
@@ -204,12 +236,9 @@ def make_app():
 
 if __name__ == "__main__":
     GPIO.setmode(GPIO.BOARD)
-    motor = Motor(16, 18, 22)
-    steering_motor = SteeringMotor(19, 21, 23)
+    command_duration = 0.1
+    motor = Motor(16, 18, 22, 19, 21, 23)
     log_entries = []
     app = make_app()
     app.listen(80)
     tornado.ioloop.IOLoop.current().start()
-    
-
-
