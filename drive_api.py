@@ -7,17 +7,12 @@ import RPi.GPIO as GPIO
 import requests
 from time import sleep
 
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        print(big_list)
-        self.write("Hello, world")
-
 class PostHandler(tornado.web.RequestHandler):
 
     def post(self):
         timestamp = datetime.now()
         data_json = tornado.escape.json_decode(self.request.body)
-        allowed_commands = set(['49','50','51','52','53','54','55','37','38','39'])
+        allowed_commands = set(['37','38','39','40'])
         command = data_json['command']
         command = list(command.keys())
         command = set(command)
@@ -30,23 +25,23 @@ class PostHandler(tornado.web.RequestHandler):
         print(log_entry)
         command_duration = 0.1
 
-        if '49' in command:
-            motor.forward_left(30)
-        elif '50' in command:
-            motor.forward_left(60)
-        elif '37' in command:
+        if '37' in command:
             motor.forward_left(100)
         elif '38' in command:
             motor.forward(100)
         elif '39' in command:
             motor.forward_right(100)
-        elif '54' in command:
-            motor.forward_right(60)
-        elif '55' in command:
-            motor.forward_right(30)
+        elif '40' in command:
+            motor.backward(100)
         else:
             motor.stop()
-         
+        
+# This only works on data from the same live python process. It doesn't 
+# read from the session.txt file. It only sorts data from the active
+# python process. This is required because it reads from a list instead
+# of a file  on data from the same live python process. It doesn't 
+# read from the session.txt file. It only sorts data from the active
+# log_entries python list
 class StoreLogEntriesHandler(tornado.web.RequestHandler):
     def get(self):
         file_path = str(os.path.dirname(os.path.realpath(__file__)))+"/clean_session.txt"
@@ -61,35 +56,18 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                 with open(file_path,"a") as writer:
                     readable_command = []
                     for element in list(command):
-                        turn_speed = 100
                         if element == '37':
-                            r = requests.post('http://localhost:80/left')
                             readable_command.append("left")
-                            steering_motor.left(turn_speed)
-                            sleep(0.5)
                         if element == '38':
-                            r = requests.post('http://localhost:80/forward')
                             readable_command.append("up")
-                            motor.forward(10)
-                            sleep(0.5)
-                            motor.stop()
                         if element == '39':
-                            r = requests.post('http://localhost:80/right')
                             readable_command.append("right")
-                            steering_motor.right(50)
-                            sleep(0.5)
-                            motor.stop()
                         if element == '40':
-                            r = requests.post('http://localhost:80/backward')
                             readable_command.append("down")
-                            motor.pwm_backward(10)
-                            sleep(0.5)
-                            motor.stop()
                     log_entry = str(list(readable_command))+" "+str(timestamp)
                     writer.write(log_entry+"\n")
                 print(log_entry)
-            #print(log_entry)
-    
+   
 class MultipleKeysHandler(tornado.web.RequestHandler):
 
     def get(self):
@@ -229,8 +207,7 @@ class Motor:
 
 def make_app():
     return tornado.web.Application([
-        (r"/abc",MainHandler),
-        (r"/a",MultipleKeysHandler),(r"/post", PostHandler),
+        (r"/drive",MultipleKeysHandler),(r"/post", PostHandler),
         (r"/StoreLogEntries",StoreLogEntriesHandler)
     ])
 
