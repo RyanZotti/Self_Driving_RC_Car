@@ -61,35 +61,18 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                 with open(file_path,"a") as writer:
                     readable_command = []
                     for element in list(command):
-                        turn_speed = 100
                         if element == '37':
-                            r = requests.post('http://localhost:80/left')
                             readable_command.append("left")
-                            steering_motor.left(turn_speed)
-                            sleep(0.5)
                         if element == '38':
-                            r = requests.post('http://localhost:80/forward')
                             readable_command.append("up")
-                            motor.forward(10)
-                            sleep(0.5)
-                            motor.stop()
                         if element == '39':
-                            r = requests.post('http://localhost:80/right')
                             readable_command.append("right")
-                            steering_motor.right(50)
-                            sleep(0.5)
-                            motor.stop()
                         if element == '40':
-                            r = requests.post('http://localhost:80/backward')
                             readable_command.append("down")
-                            motor.pwm_backward(10)
-                            sleep(0.5)
-                            motor.stop()
                     log_entry = str(list(readable_command))+" "+str(timestamp)
                     writer.write(log_entry+"\n")
                 print(log_entry)
-            #print(log_entry)
-    
+   
 class MultipleKeysHandler(tornado.web.RequestHandler):
 
     def get(self):
