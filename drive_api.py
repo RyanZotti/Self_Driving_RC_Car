@@ -67,6 +67,7 @@ class StoreLogEntriesHandler(tornado.web.RequestHandler):
                     log_entry = str(list(readable_command))+" "+str(timestamp)
                     writer.write(log_entry+"\n")
                 print(log_entry)
+        self.write("Finished")
    
 class MultipleKeysHandler(tornado.web.RequestHandler):
 
@@ -217,5 +218,5 @@ if __name__ == "__main__":
     motor = Motor(16, 18, 22, 19, 21, 23)
     log_entries = []
     app = make_app()
-    app.listen(80)
+    app.listen(81)
     tornado.ioloop.IOLoop.current().start()
