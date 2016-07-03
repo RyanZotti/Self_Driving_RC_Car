@@ -88,7 +88,10 @@ def dataprep(data_path):
                 cap.release()
                 cv2.destroyAllWindows()
 
+    predictors_np = np.array(predictors)
+    targets_np = np.array(targets)
 
 if __name__ == '__main__':
     data_path = str(os.path.dirname(os.path.realpath(__file__))) + "/data/1/"
     dataprep(data_path)
+    print("Finished.")
