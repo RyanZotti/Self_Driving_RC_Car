@@ -52,7 +52,7 @@ def dataprep(data_path):
     future_command_ts = commands[command_counter][1]
 
     predictors = []
-    target = []
+    targets = []
 
     frame_counter = -1
     while(cap.isOpened()):
@@ -76,7 +76,14 @@ def dataprep(data_path):
                     print(current_command)
                 cv2.imshow('frame',frame)
                 predictors.append(frame)
-                target.append(current_command)
+                target = [0,0,0] # in order: left, up, right
+                if current_command == 'left':
+                    target[0] = 1
+                elif current_command == 'up':
+                    target[1] = 1
+                elif current_command == 'right':
+                    target[2] = 1
+                targets.append(target)
             else:
                 cap.release()
                 cv2.destroyAllWindows()
