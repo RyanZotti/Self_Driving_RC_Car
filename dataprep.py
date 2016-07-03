@@ -111,7 +111,9 @@ def data_prep(data_path):
     validation_predictors_np = np.array(predictors)
     validation_targets_np = np.array(targets)
 
-    print("")
+    np.savez(data_path+'/final_processed_data', train_predictors=train_predictors_np,
+             train_targets=train_targets_np,validation_predictors = validation_predictors_np,
+             validation_targets = validation_targets_np)
 
 if __name__ == '__main__':
     data_path = str(os.path.dirname(os.path.realpath(__file__))) + "/data"
