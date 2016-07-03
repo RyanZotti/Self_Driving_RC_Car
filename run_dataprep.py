@@ -1,4 +1,4 @@
-from dataprep import dataprep
+from dataprep import data_prep
 import argparse
 
 ap = argparse.ArgumentParser()
@@ -7,4 +7,4 @@ ap.add_argument("-d", "--datapath", required = True,
 args = vars(ap.parse_args())
 data_path = args["datapath"]
 
-dataprep(data_path)
+data_prep(data_path)

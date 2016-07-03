@@ -4,7 +4,8 @@ import re
 import os
 from datetime import datetime
 
-def dataprep(data_path):
+
+def data_prep(data_path):
 
     cap = cv2.VideoCapture(data_path+"/output.mov")
 
@@ -90,5 +91,5 @@ def dataprep(data_path):
 
 if __name__ == '__main__':
     data_path = str(os.path.dirname(os.path.realpath(__file__))) + "/data/1/"
-    dataprep(data_path)
+    data_prep(data_path)
     print("Finished.")
