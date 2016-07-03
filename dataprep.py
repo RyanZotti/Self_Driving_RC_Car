@@ -4,8 +4,6 @@ import re
 import os
 from datetime import datetime
 
-# example: python read_camera_file.py -f /Users/ryanzotti/Documents/repos/OpenCV_examples/output.mov
-
 def dataprep(data_path):
 
     cap = cv2.VideoCapture(data_path+"/output.mov")
@@ -63,7 +61,6 @@ def dataprep(data_path):
         video_timestamp = video_timestamps[frame_counter]
         if video_timestamp > start_time:
             if video_timestamp < end_time:
-                #print(frame.shape)
                 if video_timestamp > future_command_ts:
                     current_command = future_command
                     command_counter = command_counter + 1
