@@ -56,12 +56,13 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
 
-x = tf.placeholder(tf.float32, shape=[None, 240, 320, 3])
+x = tf.placeholder(tf.float32, shape=[None, 240, 320])
+x_image = tf.reshape(x, [-1,240,320,1])
 y_ = tf.placeholder(tf.float32, shape=[None, 3])
 
-W_conv1 = weight_variable([6, 6, 3, 4])
+W_conv1 = weight_variable([6, 6, 1, 4])
 b_conv1 = bias_variable([4])
-h_conv1 = tf.nn.relu(conv2d(x, W_conv1) + b_conv1)
+h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 h_pool1 = max_pool_2x2(h_conv1)
 
 W_conv2 = weight_variable([6, 6, 4, 4])
